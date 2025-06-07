@@ -6,25 +6,25 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
-const { execSync } = require('child_process');        // 只填写UPLOAD_URL将上传节点,同时填写UPLOAD_URL和PROJECT_URL将上传订阅
-const UPLOAD_URL = process.env.UPLOAD_URL || '';      // 节点或订阅自动上传地址,需填写部署Merge-sub项目后的首页地址,例如：https://merge.serv00.net
-const PROJECT_URL = process.env.PROJECT_URL || '';    // 需要上传订阅或保活时需填写项目分配的url,例如：https://google.com
-const AUTO_ACCESS = process.env.AUTO_ACCESS || false; // false关闭自动保活，true开启,需同时填写PROJECT_URL变量
-const FILE_PATH = process.env.FILE_PATH || './tmp';   // 运行目录,sub节点文件保存目录
-const SUB_PATH = process.env.SUB_PATH || 'sub';       // 订阅路径
-const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;        // http服务订阅端口
-const UUID = process.env.UUID || '9afa0f97-643e-4c22-8156-dfa49bfcd88b'; // 使用哪吒v1,在不同的平台运行需修改UUID,否则会覆盖
-const NEZHA_SERVER = process.env.NEZHA_SERVER || '';        // 哪吒v1填写形式: nz.abc.com:8008  哪吒v0填写形式：nz.abc.com
-const NEZHA_PORT = process.env.NEZHA_PORT || '';            // 使用哪吒v1请留空，哪吒v0需填写
-const NEZHA_KEY = process.env.NEZHA_KEY || '';              // 哪吒v1的NZ_CLIENT_SECRET或哪吒v0的agent密钥
-const ARGO_DOMAIN = process.env.ARGO_DOMAIN || 'galaxy.mycf2hj.dpdns.org';          // 固定隧道域名,留空即启用临时隧道
-const ARGO_AUTH = process.env.ARGO_AUTH || 'eyJhIjoiM2IwNjc1YmExZTMzNmVlZTliZTgzOWIyMjQ2YjJkMmIiLCJ0IjoiMmJlMjY4MTktYmUyMi00YTUxLTk3MjctZGYyMTE1YjE3MTIzIiwicyI6Ik1HUmhObVV6T1RFdE5ESTBZUzAwWXpOaUxUaGpNMll0WlRObE9EVXlOREExWldGbSJ9';              // 固定隧道密钥json或token,留空即启用临时隧道,json获取地址：https://fscarmen.cloudflare.now.cc
-const ARGO_PORT = process.env.ARGO_PORT || 8001;            // 固定隧道端口,使用token需在cloudflare后台设置和这里一致
-const CFIP = process.env.CFIP || 'www.visa.com.sg';         // 节点优选域名或优选ip  
-const CFPORT = process.env.CFPORT || 443;                   // 节点优选域名或优选ip对应的端口
-const NAME = process.env.NAME || 'Vls';                     // 节点名称
+const { execSync } = require('child_process');        
+const UPLOAD_URL = process.env.UPLOAD_URL || '';    
+const PROJECT_URL = process.env.PROJECT_URL || '';  
+const AUTO_ACCESS = process.env.AUTO_ACCESS || false; 
+const FILE_PATH = process.env.FILE_PATH || './tmp';
+const SUB_PATH = process.env.SUB_PATH || 'sub'; 
+const PORT = process.env.SERVER_PORT || process.env.PORT || 3000; 
+const UUID = process.env.UUID || '9afa0f97-643e-4c22-8156-dfa49bfcd88b'; 
+const NEZHA_SERVER = process.env.NEZHA_SERVER || '';  
+const NEZHA_PORT = process.env.NEZHA_PORT || '';  
+const NEZHA_KEY = process.env.NEZHA_KEY || '';
+const ARGO_DOMAIN = process.env.ARGO_DOMAIN || 'hug.mycf2hj.us.kg';
+const ARGO_AUTH = process.env.ARGO_AUTH || 'eyJhIjoiM2IwNjc1YmExZTMzNmVlZTliZTgzOWIyMjQ2YjJkMmIiLCJ0IjoiYjI5OGVlZjItYjkwOC00MTA5LWIzZjMtNmE3OWE0YjgxODI4IiwicyI6Ik9EWXlNMk5oTUdRdE16Sm1OeTAwWkdNd0xXSmtPRFl0T1dVNVpHWTROek13TnpreSJ9';
+const ARGO_PORT = process.env.ARGO_PORT || 8001;         
+const CFIP = process.env.CFIP || 'www.visa.com.sg';
+const CFPORT = process.env.CFPORT || 443;   
+const NAME = process.env.NAME || 'Vls'; 
 
-//创建运行文件夹
+
 if (!fs.existsSync(FILE_PATH)) {
   fs.mkdirSync(FILE_PATH);
   console.log(`${FILE_PATH} is created`);
@@ -41,7 +41,7 @@ let listPath = path.join(FILE_PATH, 'list.txt');
 let bootLogPath = path.join(FILE_PATH, 'boot.log');
 let configPath = path.join(FILE_PATH, 'config.json');
 
-// 如果订阅器上存在历史运行节点则先删除
+
 function deleteNodes() {
   try {
     if (!UPLOAD_URL) return;
@@ -72,7 +72,7 @@ function deleteNodes() {
   }
 }
 
-//清理历史文件
+
 function cleanupOldFiles() {
   const pathsToDelete = ['web', 'bot', 'npm', 'php', 'sub.txt', 'boot.log'];
   pathsToDelete.forEach(file => {
@@ -81,12 +81,12 @@ function cleanupOldFiles() {
   });
 }
 
-// 根路由
+
 app.get("/", function(req, res) {
   res.send("Hello world!");
 });
 
-// 生成xr-ay配置文件
+
 const config = {
   log: { access: '/dev/null', error: '/dev/null', loglevel: 'none' },
   inbounds: [
@@ -101,7 +101,7 @@ const config = {
 };
 fs.writeFileSync(path.join(FILE_PATH, 'config.json'), JSON.stringify(config, null, 2));
 
-// 判断系统架构
+
 function getSystemArchitecture() {
   const arch = os.arch();
   if (arch === 'arm' || arch === 'arm64' || arch === 'aarch64') {
@@ -111,7 +111,7 @@ function getSystemArchitecture() {
   }
 }
 
-// 下载对应系统架构的依赖文件
+
 function downloadFile(fileName, fileUrl, callback) {
   const filePath = path.join(FILE_PATH, fileName);
   const writer = fs.createWriteStream(filePath);
@@ -144,7 +144,7 @@ function downloadFile(fileName, fileUrl, callback) {
     });
 }
 
-// 下载并运行依赖文件
+
 async function downloadFilesAndRun() {
   const architecture = getSystemArchitecture();
   const filesToDownload = getFilesForArchitecture(architecture);
@@ -172,7 +172,7 @@ async function downloadFilesAndRun() {
     console.error('Error downloading files:', err);
     return;
   }
-  // 授权和运行
+  
   function authorizeFiles(filePaths) {
     const newPermissions = 0o775;
     filePaths.forEach(relativeFilePath => {
@@ -191,14 +191,14 @@ async function downloadFilesAndRun() {
   const filesToAuthorize = NEZHA_PORT ? ['./npm', './web', './bot'] : ['./php', './web', './bot'];
   authorizeFiles(filesToAuthorize);
 
-  //运行ne-zha
+  
   if (NEZHA_SERVER && NEZHA_KEY) {
     if (!NEZHA_PORT) {
-      // 检测哪吒是否开启TLS
+      
       const port = NEZHA_SERVER.includes(':') ? NEZHA_SERVER.split(':').pop() : '';
       const tlsPorts = new Set(['443', '8443', '2096', '2087', '2083', '2053']);
       const nezhatls = tlsPorts.has(port) ? 'true' : 'false';
-      // 生成 config.yaml
+    
       const configYaml = `
 client_secret: ${NEZHA_KEY}
 debug: false
@@ -222,7 +222,7 @@ uuid: ${UUID}`;
       
       fs.writeFileSync(path.join(FILE_PATH, 'config.yaml'), configYaml);
       
-      // 运行 php
+      
       const command = `nohup ${FILE_PATH}/php -c "${FILE_PATH}/config.yaml" >/dev/null 2>&1 &`;
       try {
         await exec(command);
@@ -249,7 +249,7 @@ uuid: ${UUID}`;
   } else {
     console.log('NEZHA variable is empty,skip running');
   }
-  //运行xr-ay
+ 
   const command1 = `nohup ${FILE_PATH}/web -c ${FILE_PATH}/config.json >/dev/null 2>&1 &`;
   try {
     await exec(command1);
@@ -259,7 +259,7 @@ uuid: ${UUID}`;
     console.error(`web running error: ${error}`);
   }
 
-  // 运行cloud-fared
+
   if (fs.existsSync(path.join(FILE_PATH, 'bot'))) {
     let args;
 
@@ -283,7 +283,7 @@ uuid: ${UUID}`;
 
 }
 
-//根据系统架构返回对应的url
+
 function getFilesForArchitecture(architecture) {
   let baseFiles;
   if (architecture === 'arm') {
@@ -321,7 +321,7 @@ function getFilesForArchitecture(architecture) {
   return baseFiles;
 }
 
-// 获取固定隧道json
+
 function argoType() {
   if (!ARGO_AUTH || !ARGO_DOMAIN) {
     console.log("ARGO_DOMAIN or ARGO_AUTH variable is empty, use quick tunnels");
@@ -349,7 +349,7 @@ function argoType() {
 }
 argoType();
 
-// 获取临时隧道domain
+
 async function extractDomains() {
   let argoDomain;
 
@@ -376,7 +376,7 @@ async function extractDomains() {
         await generateLinks(argoDomain);
       } else {
         console.log('ArgoDomain not found, re-running bot to obtain ArgoDomain');
-        // 删除 boot.log 文件，等待 2s 重新运行 server 以获取 ArgoDomain
+        
         fs.unlinkSync(path.join(FILE_PATH, 'boot.log'));
         async function killBotProcess() {
           try {
@@ -392,7 +392,7 @@ async function extractDomains() {
           await exec(`nohup ${path.join(FILE_PATH, 'bot')} ${args} >/dev/null 2>&1 &`);
           console.log('bot is running.');
           await new Promise((resolve) => setTimeout(resolve, 3000));
-          await extractDomains(); // 重新提取域名
+          await extractDomains(); 
         } catch (error) {
           console.error(`Error executing command: ${error}`);
         }
@@ -402,7 +402,7 @@ async function extractDomains() {
     }
   }
 
-  // 生成 list 和 sub 信息
+  
   async function generateLinks(argoDomain) {
     const metaInfo = execSync(
       'curl -s https://speed.cloudflare.com/meta | awk -F\\" \'{print $26"-"$18}\' | sed -e \'s/ /_/g\'',
@@ -420,12 +420,12 @@ vmess://${Buffer.from(JSON.stringify(VMESS)).toString('base64')}
   
 trojan://${UUID}@${CFIP}:${CFPORT}?security=tls&sni=${argoDomain}&type=ws&host=${argoDomain}&path=%2Ftrojan-argo%3Fed%3D2560#${NAME}-${ISP}
     `;
-        // 打印 sub.txt 内容到控制台
+        
         console.log(Buffer.from(subTxt).toString('base64'));
         fs.writeFileSync(subPath, Buffer.from(subTxt).toString('base64'));
         console.log(`${FILE_PATH}/sub.txt saved successfully`);
         uplodNodes();
-        // 将内容进行 base64 编码并写入 SUB_PATH 路由
+        
         app.get(`/${SUB_PATH}`, (req, res) => {
           const encodedContent = Buffer.from(subTxt).toString('base64');
           res.set('Content-Type', 'text/plain; charset=utf-8');
@@ -437,7 +437,7 @@ trojan://${UUID}@${CFIP}:${CFPORT}?security=tls&sni=${argoDomain}&type=ws&host=$
   }
 }
 
-// 自动上传节点或订阅
+
 async function uplodNodes() {
   if (UPLOAD_URL && PROJECT_URL) {
     const subscriptionUrl = `${PROJECT_URL}/${SUB_PATH}`;
@@ -491,7 +491,7 @@ async function uplodNodes() {
   }
 }
 
-// 90s后删除相关文件
+
 function cleanFiles() {
   setTimeout(() => {
     const filesToDelete = [bootLogPath, configPath, webPath, botPath, phpPath, npmPath];  
@@ -507,11 +507,11 @@ function cleanFiles() {
       console.log('App is running');
       console.log('Thank you for using this script, enjoy!');
     });
-  }, 90000); // 90s
+  }, 90000); 
 }
 cleanFiles();
 
-// 自动访问项目URL
+
 async function AddVisitTask() {
   if (!AUTO_ACCESS || !PROJECT_URL) {
     console.log("Skipping adding automatic access task");
@@ -533,7 +533,7 @@ async function AddVisitTask() {
   }
 }
 
-// 回调运行
+
 async function startserver() {
   deleteNodes();
   cleanupOldFiles();
